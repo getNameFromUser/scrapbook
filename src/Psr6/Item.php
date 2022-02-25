@@ -19,42 +19,42 @@ class Item implements CacheItemInterface
     /**
      * @var string
      */
-    protected $hash;
+    protected string $hash;
 
     /**
      * @var string
      */
-    protected $key;
+    protected string $key;
 
     /**
      * @var Repository
      */
-    protected $repository;
+    protected Repository $repository;
 
     /**
      * @var mixed
      */
-    protected $value;
+    protected mixed $value;
 
     /**
      * @var int
      */
-    protected $expire = 0;
+    protected int $expire = 0;
 
     /**
      * @var bool
      */
-    protected $isHit = null;
+    protected ?bool $isHit = null;
 
     /**
      * @var bool
      */
-    protected $changed = false;
+    protected bool $changed = false;
 
     /**
      * @param string $key
      */
-    public function __construct($key, Repository $repository)
+    public function __construct(string $key, Repository $repository)
     {
         $this->key = $key;
 
@@ -90,7 +90,7 @@ class Item implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getKey()
+    public function getKey() : string
     {
         return $this->key;
     }
@@ -98,7 +98,7 @@ class Item implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function get()
+    public function get() : mixed
     {
         // value was already set on this object, return that one!
         if (null !== $this->value) {
@@ -107,7 +107,7 @@ class Item implements CacheItemInterface
 
         // sanity check
         if (!$this->isHit()) {
-            return;
+            return null;
         }
 
         return $this->repository->get($this->hash);
@@ -116,7 +116,7 @@ class Item implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function set($value)
+    public function set(mixed $value) : CacheItemInterface
     {
         $this->value = $value;
         $this->changed = true;
@@ -127,7 +127,7 @@ class Item implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function isHit()
+    public function isHit() : bool
     {
         if (null !== $this->isHit) {
             return $this->isHit;
@@ -139,7 +139,7 @@ class Item implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function expiresAt($expiration)
+    public function expiresAt($expiration) : CacheItemInterface
     {
         // DateTimeInterface only exists since PHP>=5.5, also accept DateTime
         if ($expiration instanceof DateTimeInterface || $expiration instanceof DateTime) {
@@ -167,7 +167,7 @@ class Item implements CacheItemInterface
     /**
      * {@inheritdoc}
      */
-    public function expiresAfter($time)
+    public function expiresAfter($time) : CacheItemInterface
     {
         if ($time instanceof DateInterval) {
             $expire = new DateTime();
@@ -193,7 +193,7 @@ class Item implements CacheItemInterface
      *
      * @return int
      */
-    public function getExpiration()
+    public function getExpiration(): int
     {
         return $this->expire;
     }
@@ -203,7 +203,7 @@ class Item implements CacheItemInterface
      *
      * @return bool
      */
-    public function isExpired()
+    public function isExpired(): bool
     {
         $expire = $this->getExpiration();
 
@@ -216,7 +216,7 @@ class Item implements CacheItemInterface
      *
      * @return bool
      */
-    public function hasChanged()
+    public function hasChanged(): bool
     {
         return $this->changed;
     }
@@ -227,7 +227,7 @@ class Item implements CacheItemInterface
      *
      * @param bool $isHit
      */
-    public function overrideIsHit($isHit)
+    public function overrideIsHit(bool $isHit)
     {
         $this->isHit = $isHit;
     }

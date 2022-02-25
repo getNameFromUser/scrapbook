@@ -53,7 +53,7 @@ class Pool implements CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function getItem($key)
+    public function getItem($key) : CacheItemInterface
     {
         $this->assertValidKey($key);
         if (array_key_exists($key, $this->deferred)) {
@@ -86,7 +86,7 @@ class Pool implements CacheItemPoolInterface
      *
      * @return Item[]
      */
-    public function getItems(array $keys = array())
+    public function getItems(array $keys = array()) : iterable
     {
         $items = array();
         foreach ($keys as $key) {
@@ -101,7 +101,7 @@ class Pool implements CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function hasItem($key)
+    public function hasItem($key) : bool
     {
         $this->assertValidKey($key);
 
@@ -113,7 +113,7 @@ class Pool implements CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear() : bool
     {
         $this->deferred = array();
 
@@ -123,7 +123,7 @@ class Pool implements CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteItem($key)
+    public function deleteItem($key) : bool
     {
         $this->assertValidKey($key);
 
@@ -138,7 +138,7 @@ class Pool implements CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteItems(array $keys)
+    public function deleteItems(array $keys) : bool
     {
         foreach ($keys as $key) {
             $this->assertValidKey($key);
@@ -156,7 +156,7 @@ class Pool implements CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function save(CacheItemInterface $item)
+    public function save(CacheItemInterface $item) : bool
     {
         if (!$item instanceof Item) {
             throw new InvalidArgumentException('MatthiasMullie\Scrapbook\Psr6\Pool can only save
@@ -182,7 +182,7 @@ class Pool implements CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function saveDeferred(CacheItemInterface $item)
+    public function saveDeferred(CacheItemInterface $item) : bool
     {
         if (!$item instanceof Item) {
             throw new InvalidArgumentException('MatthiasMullie\Scrapbook\Psr6\Pool can only save
@@ -201,7 +201,7 @@ class Pool implements CacheItemPoolInterface
     /**
      * {@inheritdoc}
      */
-    public function commit()
+    public function commit() : bool
     {
         $deferred = array();
         foreach ($this->deferred as $key => $item) {
@@ -235,7 +235,7 @@ class Pool implements CacheItemPoolInterface
      *
      * @throws InvalidArgumentException
      */
-    protected function assertValidKey($key)
+    protected function assertValidKey(string $key)
     {
         if (!is_string($key)) {
             throw new InvalidArgumentException('Invalid key: '.var_export($key, true).'. Key should be a string.');

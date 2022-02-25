@@ -35,7 +35,7 @@ class SimpleCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function get($key, $default = null)
+    public function get($key, $default = null) : mixed
     {
         $this->assertValidKey($key);
 
@@ -43,13 +43,13 @@ class SimpleCache implements CacheInterface
         // be confused for a `false` value), so we'll check existence with getMulti
         $multi = $this->store->getMulti(array($key));
 
-        return isset($multi[$key]) ? $multi[$key] : $default;
+        return $multi[$key] ?? $default;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function set($key, $value, $ttl = null)
+    public function set($key, $value, $ttl = null) : bool
     {
         $this->assertValidKey($key);
         $ttl = $this->ttl($ttl);
@@ -60,7 +60,7 @@ class SimpleCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function delete($key)
+    public function delete($key) : bool
     {
         $this->assertValidKey($key);
 
@@ -74,7 +74,7 @@ class SimpleCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): bool
     {
         return $this->store->flush();
     }
@@ -82,7 +82,7 @@ class SimpleCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function getMultiple($keys, $default = null)
+    public function getMultiple($keys, $default = null) : iterable
     {
         if ($keys instanceof Traversable) {
             $keys = iterator_to_array($keys, false);
@@ -106,7 +106,7 @@ class SimpleCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null) : bool
     {
         if ($values instanceof Traversable) {
             // we also need the keys, and an array is stricter about what it can
@@ -142,7 +142,7 @@ class SimpleCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys) : bool
     {
         if ($keys instanceof Traversable) {
             $keys = iterator_to_array($keys, false);
@@ -163,7 +163,7 @@ class SimpleCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has($key) : bool
     {
         $this->assertValidKey($key);
 
@@ -181,7 +181,7 @@ class SimpleCache implements CacheInterface
      *
      * @throws InvalidArgumentException
      */
-    protected function assertValidKey($key)
+    protected function assertValidKey(string $key)
     {
         if (!is_string($key)) {
             throw new InvalidArgumentException('Invalid key: '.var_export($key, true).'. Key should be a string.');
@@ -202,13 +202,13 @@ class SimpleCache implements CacheInterface
      * Accepts all TTL inputs valid in PSR-16 (null|int|DateInterval) and
      * converts them into TTL for KeyValueStore (int).
      *
-     * @param int|DateInterval|null $ttl
+     * @param DateInterval|int|null $ttl
      *
      * @return int
      *
      * @throws \TypeError
      */
-    protected function ttl($ttl)
+    protected function ttl(DateInterval|int|null $ttl): int
     {
         if (null === $ttl) {
             return 0;
